@@ -1,28 +1,23 @@
 <script>
+import * as $ from "jquery";
+
 export default {
   data() {
     return {
       expire: null,
       productFilter: null,
+      change: false,
     };
   },
   mounted() {
     this.getMobileOperatingSystem();
   },
-
   methods: {
     getMobileOperatingSystem() {
       if ("product" in this.$route.query) {
         this.productFilter = this.$route.query.product;
       }
 
-      // if (this.$route.query.product === "App") {
-      //   console.log(this.$route.query);
-      // } else if (this.$route.query.product === "Payment") {
-      //   console.log(this.$route.query);
-      // } else if (this.$route.query.product === "Recharge") {
-      //   console.log(this.$route.query);
-      // }
       var userAgent = navigator.userAgent || navigator.vendor || window.opera;
 
       if (/windows phone/i.test(userAgent)) {
@@ -32,31 +27,57 @@ export default {
 
       if (/android/i.test(userAgent)) {
         this.expire = "Android";
+        var deeplinkUrl = `https://com.myunitel`;
+        var that = this;
 
-        setTimeout(function () {
-          window.location =
-            "https://play.google.com/store/apps/details?id=com.myunitel.activities";
-        }, 25);
-        window.location = "https://com.myunitel";
+        $(window).on("focus", function () {
+          that.change = true;
+        });
+
+        $(window).on("blur", function () {
+          that.change = true;
+        });
+
+        setTimeout(() => {
+          if (!that.change) {
+            var redirectUrl =
+              "https://play.google.com/store/apps/details?id=com.myunitel.activities";
+            window.location = redirectUrl;
+          }
+        }, 3000);
+
+        window.location = deeplinkUrl;
         return;
       }
 
       if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
         this.expire = "iOS";
-        setTimeout(function () {
-          window.location = "https://apps.apple.com/mn/app/unitel/id591293253";
-        }, 25);
-        window.location = "instagram://";
+        var deeplinkUrl = `com.myunitel://`;
+        var that = this;
+
+        setTimeout(() => {
+          if (!that.change) {
+            var redirectUrl =
+              "https://apps.apple.com/mn/app/unitel/id591293253";
+            window.location = redirectUrl;
+          }
+        }, 3000);
+
+        window.location = deeplinkUrl;
+
+        window.onblur = function () {
+          that.change = true;
+        };
+
+        window.onfocus = function () {
+          that.change = false;
+        };
         return;
       }
       this.expire = "unknown";
       return;
     },
   },
-  setup() {
-    return {};
-  },
-  created() {},
 };
 </script>
 
